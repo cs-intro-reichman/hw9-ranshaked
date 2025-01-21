@@ -51,7 +51,9 @@ public class LinkedList {
                 last = newNode;
             }
         } else if (index == size) {
-            last.next = newNode;
+            if (last != null) {
+                last.next = newNode;
+            }
             last = newNode;
         } else {
             Node prevNode = getNode(index - 1);
@@ -116,6 +118,10 @@ public class LinkedList {
             throw new IllegalArgumentException("Block not found in the list");
         }
         remove(index);
+    }
+
+    public ListIterator iterator() {
+        return new ListIterator(first);
     }
 
     public String toString() {
