@@ -53,6 +53,9 @@ public class LinkedList {
 		if (index < 0 || index >= size) {
 			System.out.println("index must be between 0 and size");
 		}
+		if (first == null) {
+			System.out.println("List is empty");
+		}
 		Node currentNode = first;  
     	for (int i = 0; i < index; i++) 
 		{
@@ -257,8 +260,6 @@ public class LinkedList {
 			currentNode.next = currentNode.next.next;
 		}
 	}
-	
-
 	/**
 	 * Removes from this list the node pointing to the given memory block.
 	 * 
