@@ -91,11 +91,10 @@ public class LinkedList {
         return -1;
     }
     public void remove(Node node) {
-        if (first == node) {
+        if (first == node) 
+        {
             first = first.next;
-            if (first == null)
-             {
-                last = first;
+            if (first == null) last = first;
                 size --;
             }
             for(int i = 1 ; i < size ; i++)
@@ -115,7 +114,7 @@ public class LinkedList {
                 }
             }
         }
-    }
+    
     public void remove(int index) {
         remove(getNode(index));
     }
