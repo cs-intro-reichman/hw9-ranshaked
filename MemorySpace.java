@@ -1,3 +1,5 @@
+
+
 public class MemorySpace {
 
     private LinkedList allocatedList;
@@ -8,58 +10,70 @@ public class MemorySpace {
         freeList = new LinkedList();
         freeList.addLast(new MemoryBlock(0, maxSize));
     }
-
     public int malloc(int length) {
-        if (length <= 0) {
-            throw new IllegalArgumentException("Requested size must be greater than 0");
-        }
-        for (int i = 0; i < freeList.getSize(); i++) {
-            MemoryBlock block = freeList.getBlock(i);
-            if (block.length >= length) {
-                int allocatedAddress = block.baseAddress;
-                MemoryBlock allocatedBlock = new MemoryBlock(allocatedAddress, length);
-                allocatedList.addLast(allocatedBlock);
-                block.baseAddress += length;
-                block.length -= length;
-                if (block.length == 0) {
-                    freeList.remove(i);
-                }
-                return allocatedAddress;
-            }
-        }
+     ListIterator free = freeList.iterator();
+     while(free.hasNext())
+     {
+         MemoryBlock currentBlock = free.next();
+         if(currentBlock.length == length)
+         {
+           int address = currentBlock.baseAddress;
+           allocatedList.addLast(currentBlock);
+           freeList.remove(currentBlock);
+           return address;
+         }
+         if(currentBlock.length > length)
+         {
+           allocatedList.addLast(new MemoryBlock(currentBlock.baseAddress, length));
+           int address = currentBlock.baseAddress;
+           currentBlock.length -= length;
+           currentBlock.baseAddress += length;
+           return address;
+         }
+     }
         return -1;
     }
 
     public void free(int address) {
-        MemoryBlock blockToFree = null;
-        for (int i = 0; i < allocatedList.getSize(); i++) {
-            MemoryBlock block = allocatedList.getBlock(i);
-            if (block.baseAddress == address) {
-                blockToFree = block;
-                allocatedList.remove(i);
-                break;
+        if(allocatedList.getSize() == 0)
+        {
+            throw new IllegalArgumentException("index must be between 0 and size");
+        }
+        ListIterator allocated = allocatedList.iterator();
+        while(allocated.hasNext())
+        {
+            MemoryBlock currentBlock = allocated.next();
+            if(currentBlock.baseAddress == address)
+            {
+                freeList.addLast(currentBlock);
+                allocatedList.remove(currentBlock);
             }
         }
-        if (blockToFree == null) {
-            throw new IllegalArgumentException("Invalid address: no allocated block found");
-        }
-        freeList.addLast(blockToFree);
-        defrag();
     }
-
     public void defrag() {
-        for (int i = 0; i < freeList.getSize() - 1; i++) {
-            MemoryBlock current = freeList.getBlock(i);
-            MemoryBlock next = freeList.getBlock(i + 1);
-            if (current.baseAddress + current.length == next.baseAddress) {
-                current.length += next.length;
-                freeList.remove(i + 1);
-                i--;
-            }
-        }
-    }
+        boolean meged;
+        do{
+            meged = false;
+         ListIterator FreeQuter = freeList.iterator();  
+         while(FreeQuter.hasNext())
+         {
+                MemoryBlock currentBlock = FreeQuter.next();
+                ListIterator FreeInner = freeList.iterator();
+                while(FreeInner.hasNext())
+                {
+                    MemoryBlock candidaterBlock = FreeInner.next();
+                    if(currentBlock != candidaterBlock && currentBlock.baseAddress + currentBlock.length == candidaterBlock.baseAddress)
+                    {
+                        currentBlock.length += candidaterBlock.length;
+                        freeList.remove(candidaterBlock);
+                        meged = true;
+                    }
+                }
+            }  
+    }while(meged);
+}
 
     public String toString() {
-        return "Free List: " + freeList.toString() + "\nAllocated List: " + allocatedList.toString();
+        return freeList.toString() + "\n" + allocatedList.toString();
     }
 }
